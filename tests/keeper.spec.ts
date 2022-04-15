@@ -1,10 +1,4 @@
-import {
-  configureKeeper,
-  getItem,
-  setItem,
-  removeItem,
-  removeRoot,
-} from '../src/keeper'
+import { configureKeeper, getKeeper } from '../src/keeper'
 import { createMemoryStorage } from 'storage-memory'
 
 describe('customRootKey', () => {
@@ -16,22 +10,25 @@ describe('customRootKey', () => {
   })
 
   it('should setItem getItem correctly', async () => {
-    await setItem('subKey', 'subKeyData')
-    const result = await getItem('subKey')
+    const keeper = getKeeper('customRootKey')
+    await keeper.setItem('subKey', 'subKeyData')
+    const result = await keeper.getItem('subKey')
     expect(result).toBe('subKeyData')
   })
 
   it('should setItem removeItem correctly', async () => {
-    await setItem('subKey', 'subKeyData')
-    await removeItem('subKey')
-    const result = await getItem('subKey')
+    const keeper = getKeeper('customRootKey')
+    await keeper.setItem('subKey', 'subKeyData')
+    await keeper.removeItem('subKey')
+    const result = await keeper.getItem('subKey')
     expect(result).toBeUndefined()
   })
 
   it('should setItem removeRoot correctly', async () => {
-    await setItem('subKey', 'subKeyData')
-    await removeRoot()
-    const result = await getItem('subKey')
+    const keeper = getKeeper('customRootKey')
+    await keeper.setItem('subKey', 'subKeyData')
+    await keeper.removeRoot()
+    const result = await keeper.getItem('subKey')
     expect(result).toBeUndefined()
   })
 })
@@ -44,22 +41,25 @@ describe('default rootKey', () => {
   })
 
   it('should setItem getItem correctly', async () => {
-    await setItem('subKey', 'subKeyData')
-    const result = await getItem('subKey')
+    const keeper = getKeeper()
+    await keeper.setItem('subKey', 'subKeyData')
+    const result = await keeper.getItem('subKey')
     expect(result).toBe('subKeyData')
   })
 
   it('should setItem removeItem correctly', async () => {
-    await setItem('subKey', 'subKeyData')
-    await removeItem('subKey')
-    const result = await getItem('subKey')
+    const keeper = getKeeper()
+    await keeper.setItem('subKey', 'subKeyData')
+    await keeper.removeItem('subKey')
+    const result = await keeper.getItem('subKey')
     expect(result).toBeUndefined()
   })
 
   it('should setItem removeRoot correctly', async () => {
-    await setItem('subKey', 'subKeyData')
-    await removeRoot()
-    const result = await getItem('subKey')
+    const keeper = getKeeper()
+    await keeper.setItem('subKey', 'subKeyData')
+    await keeper.removeRoot()
+    const result = await keeper.getItem('subKey')
     expect(result).toBeUndefined()
   })
 })

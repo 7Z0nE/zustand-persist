@@ -1,13 +1,7 @@
 import { getLoadManager } from './LoadManager'
-import { SetState, GetState, StateCreator, State, StoreApi } from 'zustand'
+import { SetState, GetState, StateCreator, State } from 'zustand'
 import { parseJson } from './parseJson'
-import {
-  configureKeeper,
-  getItem,
-  setItem,
-  removeRoot,
-  KeeperOption,
-} from './keeper'
+import { configureKeeper, KeeperOption } from './keeper'
 import reconcile, { NonFunctionPropertyNames } from './reconcile'
 
 export interface PersistOption<S extends State> {
@@ -19,7 +13,7 @@ export interface PersistOption<S extends State> {
 type ConfigurePersistOption = KeeperOption
 
 export function configurePersist(option: ConfigurePersistOption) {
-  configureKeeper(option)
+  const keeper = configureKeeper(option)
   const loadManager = getLoadManager()
 
   async function hydrate<TState extends State>(
@@ -28,7 +22,7 @@ export function configurePersist(option: ConfigurePersistOption) {
     get: GetState<TState>
   ) {
     if (!loadManager.isLoaded(key)) {
-      const saveState = parseJson(await getItem(key))
+      const saveState = parseJson(await keeper.getItem(key))
       if (saveState) {
         set({
           ...get(),
@@ -52,7 +46,7 @@ export function configurePersist(option: ConfigurePersistOption) {
       async (payload) => {
         set(payload)
         const state = reconcile(get(), { allowlist, denylist })
-        await setItem(key, JSON.stringify(state))
+        await keeper.setItem(key, JSON.stringify(state))
       },
       get,
       api
@@ -60,7 +54,7 @@ export function configurePersist(option: ConfigurePersistOption) {
   }
 
   async function purge() {
-    return removeRoot()
+    return keeper.removeRoot()
   }
 
   return {

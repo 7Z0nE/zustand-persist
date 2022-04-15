@@ -6,55 +6,80 @@ interface AnyStorage {
   removeItem: (key: string) => Promise<void> | void
 }
 
-let _rootKey = 'root'
-let _storage: AnyStorage
-
 export interface KeeperOption {
   storage: AnyStorage
   rootKey?: string
 }
 
-export function configureKeeper(option: KeeperOption) {
-  _storage = option.storage
-  _rootKey = option?.rootKey || _rootKey
-}
-
-export async function getItem(key: string) {
-  const draft = await getRoot()
-  return draft[key]
-}
-
-let isRemovingRoot = false
-
-export async function setItem(key: string, value: string) {
-  const draft = await getRoot()
-  draft[key] = value
-
-  if (isRemovingRoot) {
-    return
-  }
-  _cachedRoot = draft
-  await _storage.setItem(_rootKey, JSON.stringify(draft))
-}
-
-export async function removeItem(key: string) {
-  const draft = await getRoot()
-  delete draft[key]
-  await _storage.setItem(_rootKey, JSON.stringify(draft))
-}
-
-let _cachedRoot: any = null
-async function getRoot() {
-  if (_cachedRoot) {
-    return _cachedRoot
-  }
-  _cachedRoot = parseJson(await _storage.getItem(_rootKey))
-  return _cachedRoot
-}
-
-export async function removeRoot() {
-  isRemovingRoot = true
-  await _storage.removeItem(_rootKey)
-  _cachedRoot = undefined
+export class Keeper {
+  _rootKey!: string
+  _storage!: AnyStorage
+  _cachedRoot: any = null
   isRemovingRoot = false
+
+  constructor(option: KeeperOption) {
+    this.configureKeeper(option)
+  }
+
+  configureKeeper(option: KeeperOption) {
+    this._storage = option.storage
+    this._rootKey = option?.rootKey || this._rootKey
+  }
+
+  async getItem(key: string) {
+    const draft = await this.getRoot()
+    return draft[key]
+  }
+
+  async setItem(key: string, value: string) {
+    const draft = await this.getRoot()
+    draft[key] = value
+
+    if (this.isRemovingRoot) {
+      return
+    }
+    this._cachedRoot = draft
+    await this._storage.setItem(this._rootKey, JSON.stringify(draft))
+  }
+
+  async removeItem(key: string) {
+    const draft = await this.getRoot()
+    delete draft[key]
+    await this._storage.setItem(this._rootKey, JSON.stringify(draft))
+  }
+
+  async getRoot() {
+    if (this._cachedRoot) {
+      return this._cachedRoot
+    }
+    this._cachedRoot = parseJson(await this._storage.getItem(this._rootKey))
+    return this._cachedRoot
+  }
+
+  async removeRoot() {
+    this.isRemovingRoot = true
+    await this._storage.removeItem(this._rootKey)
+    this._cachedRoot = undefined
+    this.isRemovingRoot = false
+  }
+}
+
+let _keepers = new Map<string, Keeper>()
+
+export function configureKeeper(option: KeeperOption) {
+  if (!option.rootKey) option.rootKey = 'root'
+
+  let keeper = _keepers.get(option.rootKey)
+
+  if (keeper) keeper.configureKeeper(option)
+  else {
+    keeper = new Keeper(option)
+    _keepers.set(option.rootKey, keeper)
+  }
+
+  return keeper
+}
+
+export function getKeeper(key: string = 'root') {
+  return _keepers.get(key)
 }
