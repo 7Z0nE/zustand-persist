@@ -14,7 +14,7 @@ type ConfigurePersistOption = KeeperOption
 
 export function configurePersist(option: ConfigurePersistOption) {
   const keeper = configureKeeper(option)
-  const loadManager = getLoadManager()
+  const loadManager = getLoadManager(option.rootKey)
 
   async function hydrate<TState extends State>(
     key: string,

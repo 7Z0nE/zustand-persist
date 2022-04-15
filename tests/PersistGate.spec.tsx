@@ -67,6 +67,7 @@ it('should not show anything before gate lift', async () => {
 
 it('should show loading', async () => {
   render(<Root loading={<div>loading</div>} />)
+  console.log(screen.debug())
   expect(screen.getByText('loading')).toBeVisible()
   await waitFor(() => screen.getByTestId('rootDiv'))
 })

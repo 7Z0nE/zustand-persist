@@ -27,11 +27,20 @@ export class LoadManager {
   }
 }
 
-let cachedLoadManager: LoadManager | undefined
+const cachedLoadManagers = new Map<string, LoadManager>()
 
-export function getLoadManager() {
-  if (!cachedLoadManager) {
-    cachedLoadManager = new LoadManager()
+export function getLoadManager(key: string | undefined) {
+  if (!key) key = 'root'
+  let manager = cachedLoadManagers.get(key)
+
+  if (!manager) {
+    manager = new LoadManager()
+    cachedLoadManagers.set(key, manager)
   }
-  return cachedLoadManager
+
+  return manager
+}
+
+export function getLoadManagers() {
+  return Array.from(cachedLoadManagers.values())
 }

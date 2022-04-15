@@ -1,7 +1,7 @@
 import { getLoadManager } from './../src/LoadManager'
 
 it('isLoaded should be false', () => {
-  const loadManager = getLoadManager()
+  const loadManager = getLoadManager('root')
   loadManager.register('key1')
   loadManager.register('key2')
 
@@ -10,7 +10,7 @@ it('isLoaded should be false', () => {
 })
 
 it('isLoaded should be false', () => {
-  const loadManager = getLoadManager()
+  const loadManager = getLoadManager('root')
   loadManager.register('key1')
   loadManager.register('key2')
 
@@ -21,7 +21,7 @@ it('isLoaded should be false', () => {
 })
 
 it('isLoaded trigger all onAllLoaded', () => {
-  const loadManager = getLoadManager()
+  const loadManager = getLoadManager('root')
   const callback = jest.fn()
 
   loadManager.onAllLoaded(callback)
@@ -35,7 +35,7 @@ it('isLoaded trigger all onAllLoaded', () => {
 })
 
 it('isLoaded trigger all onAllLoaded second times', () => {
-  const loadManager = getLoadManager()
+  const loadManager = getLoadManager('root')
   const callback = jest.fn()
 
   loadManager.onAllLoaded(callback)
