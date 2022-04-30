@@ -1,6 +1,6 @@
 {
   "name": "@onlyknoppas/zustand-persist",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "persist and rehydrate zustand stores",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
