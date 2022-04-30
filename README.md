@@ -1,5 +1,9 @@
 # Zustand persist
 
+This for implements the following enhancements:
+
+- creating multiple stores under different keys in different storages
+
 Persist and rehydrate state works on react and react native.
 
 [Zustand](https://github.com/react-spring/zustand) is a small, fast and scaleable bearbones state-management solution.
@@ -69,6 +73,7 @@ function App() {
 ```
 
 ## Limitations
+
 Zustand allows any valid JavaScript data types to set in the store, such as Set, Map, or functions. Both `localStorage` and `AsyncStorage` require that all values set in them be serializable, or converted into string form for storage. This means if you wish to persist the contents of your store all of its values need to be serializable. Any values which are not serializable will be silently absent upon hydration.
 
 A note on storing actions (functions): your actions are safe as long as they exist in the initial state during store creation. The hydration process merges initial state with stored state.
